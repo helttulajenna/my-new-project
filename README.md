@@ -2,7 +2,6 @@
 Building AI course project
 <!-- This is the markdown template for the final project of the Building AI course, 
 created by Reaktor Innovations and University of Helsinki. 
-Copy the template, paste it to your GitHub README and edit! -->
 
 # Project Title
 
@@ -26,29 +25,41 @@ With the vast amount of content available on Netflix, users often struggle to fi
 Users provide input regarding their preferences, such as genres they enjoy, favorite shows, or ratings of previously watched series. The AI algorithms analyze this data along with Netflix's extensive content library to generate tailored recommendations. Users can explore suggested series and choose the ones that interest them.
 
 Images will make your README look nice!
-Once you upload an image to your repository, you can link link to it like this (replace the URL with file path, if you've uploaded an image to Github.)
-![Cat](https://upload.wikimedia.org/wikipedia/commons/5/5e/Sleeping_cat_on_her_back.jpg)
 
-If you need to resize images, you have to use an HTML tag, like this:
-<img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Sleeping_cat_on_her_back.jpg" width="300">
+Code examples:
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 
-This is how you create code examples:
-```
-def main():
-   countries = ['Denmark', 'Finland', 'Iceland', 'Norway', 'Sweden']
-   pop = [5615000, 5439000, 324000, 5080000, 9609000]   # not actually needed in this exercise...
-   fishers = [1891, 2652, 3800, 11611, 1757]
+ratings_data = {
+    'User': ['User1', 'User2', 'User3', 'User4'],
+    'Stranger Things': [5, 4, 0, 4],
+    'The Crown': [4, 5, 3, 0],
+    'Breaking Bad': [0, 4, 5, 5],
+    'Narcos': [3, 0, 4, 3],
+    # Add more series and ratings as needed
+}
 
-   totPop = sum(pop)
-   totFish = sum(fishers)
+ratings_df = pd.DataFrame(ratings_data)
+cosine_sim = cosine_similarity(ratings_df.drop('User', axis=1))
 
-   # write your solution here
+def get_recommendations(user):
+    user_index = ratings_df[ratings_df['User'] == user].index[0]
+    sim_scores = list(enumerate(cosine_sim[user_index]))
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+    sim_scores = sim_scores[1:]  # Exclude self
+    similar_users = [i[0] for i in sim_scores]
 
-   for i in range(len(countries)):
-      print("%s %.2f%%" % (countries[i], 100.0))    # current just prints 100%
+    recommendations = []
+    for user_index in similar_users:
+        for series, rating in ratings_df.drop('User', axis=1).iloc[user_index].items():
+            if rating > 3 and ratings_df.iloc[user_index][series] == 0:
+                recommendations.append(series)
+    return recommendations[:5]  # Return top 5 recommendations
 
-main()
-```
+user = 'User1'
+recommended_series = get_recommendations(user)
+print(f"Recommended series for {user}: {recommended_series}")
+
 
 
 ## Data sources and AI methods
